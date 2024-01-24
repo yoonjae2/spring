@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="rental">
+
+	<insert id="insert" parameterType="map">
+		insert into tbl_rental_book(
+		b_no
+		,u_m_no
+		,rb_start_date
+		,rb_reg_date
+		,rb_mod_date
+		)
+		values(
+		#{b_no},
+		#{u_m_no},
+		now(),
+		now(),
+		now()
+		)
+	</insert>
+
+	<select id="select" parameterType="int" resultType="map">
+		select
+		tb.b_no,
+		tb.b_name,
+		tb.b_isbn,
+		tb.b_call_number,
+		trb.rb_start_date
+		from
+		tbl_user_member tum join tbl_rental_book trb on tum.u_m_no =
+		trb.u_m_no
+		join tbl_book tb on tb.b_no = trb.b_no
+		where tum.u_m_no =
+		#{u_m_no} and trb.rb_end_date = '1000-01-01'
+	</select>
+
+	<update id="returnbook"
+		parameterType="com.office.library.book.admin.RentalBooksVo">
+		update
+		tbl_rental_book trb
+		join tbl_book tb
+		ON trb.b_no = tb.b_no
+		set
+		trb.rb_end_date = now()
+		,tb.b_rantal_able = 1
+		where
+		tb.b_no = #{b_no}
+		AND trb.rb_no = #{rb_no}
+	</update>
+
+	<select id="history" parameterType="int" resultType="map">
+			select
+		trb.b_no
+		,tb.b_name
+		,tb.b_isbn
+		,tb.b_call_number
+		,trb.rb_start_date
+		,trb.rb_end_date
+			from 
+		tbl_rental_book trb 
+		join tbl_book tb ON tb.b_no = trb.b_no
+			where trb.u_m_no = #{u_m_no}
+			ORDER BY trb.rb_reg_date DESC
+			;
+	</select>
+
+
+</mapper>
+  

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="book">
+
+	<!-- 페이징 쿼리 -->
+	<select id="AllBook" parameterType="int" resultType="map">
+		select *
+		from tbl_book
+		Order By b_no DESC
+		limit 10 offset #{offset}
+	</select>
+	<!-- 전체갯수 가져오기 -->
+	<select id="totalBookCount" resultType="int">
+		select count(*) from
+		tbl_book
+	</select>
+
+
+	<update id="updateRegister" parameterType="int">
+		update tbl_hope_book
+		set
+		hb_result = 1
+		,hb_result_last_date = now()
+		where hb_no = #{hb_no}
+	</update>
+
+
+	<select id="selectHope" resultType="map">
+		select
+		thb.hb_no
+		,
+		concat(tum.u_m_name,'(',tum.u_m_id,')') u_m_id
+		,thb.hb_name
+		,thb.hb_author
+		,thb.hb_publisher
+		,thb.hb_publish_year
+		,thb.hb_result
+		from
+		tbl_hope_book thb
+		join tbl_user_member tum
+		on thb.u_m_no = tum.u_m_no
+	</select>
+
+	<update id="hopegood" parameterType="int">
+		update tbl_hope_book
+		set
+		hb_result = #{hb_result}, hb_result_last_date = #{hb_result_last_date}
+	</update>
+
+
+	<select id="select" resultType="map">
+		select
+		concat(tum.u_m_name,'(',tum.u_m_id,')') u_m_name,
+		tb.b_name,
+		tb.b_author,
+		concat(tb.b_publisher,'(',tb.b_publish_year ,')')
+		b_publisher,
+		tb.b_isbn,
+		tb.b_call_number,
+		tb.b_rantal_able,
+		tb.b_no,
+		trb.rb_no
+		from tbl_user_member tum join tbl_rental_book trb on
+		tum.u_m_no = trb.u_m_no
+		join tbl_book tb
+		on
+		tb.b_no = trb.b_no
+		Where
+		trb.rb_end_date = '1000-01-01' and tb.b_rantal_able =
+		0;
+	</select>
+
+
+	<select id="selectByIsbn" parameterType="String"
+		resultType="int">
+		select count(*)
+		from tbl_book
+		where b_isbn = #{b_isbn}
+	</select>
+	<insert id="insertbook" parameterType="map">
+		insert into tbl_book(
+		b_thumbnail,
+		b_name,
+		b_author,
+		b_publisher,
+		b_publish_year,
+		b_isbn,
+		b_call_number,
+		b_genre,
+		b_rantal_able,
+		b_reg_date
+		)
+		values(
+		#{b_thumbnail},
+		#{b_name},
+		#{b_author},
+		#{b_publisher},
+		#{b_publish_year},
+		#{b_isbn},
+		#{b_call_number},
+		#{b_genre},
+		#{b_rantal_able},
+		now()
+		)
+	</insert>
+
+	<select id="searchbook" parameterType="String" resultType="map">
+		select * from tbl_book where b_name like CONCAT('%',#{b_name},'%')
+	</select>
+
+
+	<select id="detail" parameterType="int"
+		resultType="com.office.library.book.BookVo">
+		select * from tbl_book where b_no = #{b_no}
+	</select>
+
+	<delete id="delete" parameterType="int">
+		delete from tbl_book where
+		b_no = #{b_no}
+	</delete>
+
+	<update id="modify" parameterType="BookVo">
+		update tbl_book
+		set
+		b_name =
+		#{b_name}
+		, b_author = #{b_author}
+		, b_publisher = #{b_publisher}
+		, b_genre = #{b_genre}
+		, b_publish_year = #{b_publish_year}
+		, b_isbn = #{b_isbn}
+		, b_call_number
+		= #{b_call_number}
+		, b_rantal_able = #{b_rantal_able}
+		, b_thumbnail =
+		#{b_thumbnail}
+		, b_mod_date = now()
+		where b_no = #{b_no}
+	</update>
+
+
+</mapper>
+  
